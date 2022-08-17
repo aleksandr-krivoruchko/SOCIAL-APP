@@ -16,7 +16,6 @@ const loadFonts = async () => {
   await Font.loadAsync({
     "Roboto-Regular": require("./assets/fonts/Roboto-Medium.ttf"),
     "Roboto-Medium": require("./assets/fonts/Roboto-Medium.ttf"),
-    "Roboto-Bold": require("./assets/fonts/Roboto-Bold.ttf"),
   });
 };
 
@@ -44,7 +43,6 @@ export default function App() {
           <RegistrationScreen
             isShowKeyboard={isShowKeyboard}
             setIsShowKeyboard={setIsShowKeyboard}
-            keyboardHide={keyboardHide}
           />
           {/* <LoginScreen /> */}
         </ImageBackground>

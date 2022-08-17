@@ -12,17 +12,21 @@ import {
   TouchableWithoutFeedback,
 } from "react-native";
 
-export function RegistrationScreen({
-  isShowKeyboard,
-  setIsShowKeyboard,
-  keyboardHide,
-}) {
-  //   const [isShowKeyboard, setIsShowKeyboard] = React.useState(false);
+const initialState = {
+  login: "",
+  email: "",
+  password: "",
+};
 
-  //   const keyboardHide = () => {
-  //     setIsShowKeyboard(false);
-  //     Keyboard.dismiss();
-  //   };
+export function RegistrationScreen({ isShowKeyboard, setIsShowKeyboard }) {
+  const [state, setState] = React.useState(initialState);
+
+  const onSubmit = (e) => {
+    setIsShowKeyboard(false);
+    Keyboard.dismiss();
+    console.log(state);
+    setState(initialState);
+  };
 
   return (
     <View style={{ ...styles.container, marginTop: isShowKeyboard ? 40 : 0 }}>
@@ -37,22 +41,34 @@ export function RegistrationScreen({
             style={styles.input}
             placeholder="Логин"
             onFocus={() => setIsShowKeyboard(true)}
+            onChangeText={(value) =>
+              setState((prevState) => ({ ...prevState, login: value }))
+            }
+            value={state.login}
           />
           <TextInput
             style={styles.input}
             placeholder="Адресс электронной почты"
             onFocus={() => setIsShowKeyboard(true)}
+            onChangeText={(value) =>
+              setState((prevState) => ({ ...prevState, email: value }))
+            }
+            value={state.email}
           />
           <TextInput
             style={styles.input}
             placeholder="Пароль"
             secureTextEntry={true}
             onFocus={() => setIsShowKeyboard(true)}
+            onChangeText={(value) =>
+              setState((prevState) => ({ ...prevState, password: value }))
+            }
+            value={state.password}
           />
           <TouchableOpacity
             style={styles.button}
             activeOpacity={0.7}
-            onPress={keyboardHide}>
+            onPress={onSubmit}>
             <Text style={styles.btnText}>Зарегистрироваться</Text>
           </TouchableOpacity>
           <View style={{ alignItems: "center" }}>
