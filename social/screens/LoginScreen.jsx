@@ -5,71 +5,140 @@ import {
   Text,
   View,
   TextInput,
+  ImageBackground,
   TouchableOpacity,
   Platform,
   Keyboard,
   KeyboardAvoidingView,
+  TouchableWithoutFeedback,
 } from "react-native";
 
-export function LoginScreen() {
+const initialState = {
+  email: "",
+  password: "",
+};
+
+export function LoginScreen({ navigation }) {
+  const [state, setState] = React.useState(initialState);
   const [isShowKeyboard, setIsShowKeyboard] = React.useState(false);
+  const [isFocused1, setIsFocused1] = React.useState(false);
+  const [isFocused2, setIsFocused2] = React.useState(false);
 
   const keyboardHide = () => {
-    setIsShowKeyboard(true);
+    setIsShowKeyboard(false);
     Keyboard.dismiss();
   };
 
+  const onSubmit = () => {
+    keyboardHide();
+    console.log(state);
+    setState(initialState);
+  };
+
   return (
-    <View style={styles.container}>
-      <View style={{ alignItems: "center" }}>
-        <Text style={styles.title}>Войти</Text>
+    <TouchableWithoutFeedback onPress={keyboardHide}>
+      <View style={styles.container}>
+        <ImageBackground
+          source={require("../assets/background-image.jpg")}
+          style={styles.image}>
+          <View
+            style={{ ...styles.content, marginTop: isShowKeyboard ? 40 : 0 }}>
+            <View style={{ alignItems: "center" }}>
+              <Text style={styles.title}>Войти</Text>
+            </View>
+
+            <KeyboardAvoidingView
+              behavior={Platform.OS === "ios" ? "padding" : "height"}>
+              <View style={styles.form}>
+                <TextInput
+                  style={{
+                    ...styles.input,
+                    borderColor: isFocused1 ? "#FF6C00" : "#E8E8E8",
+                  }}
+                  placeholder="Адрес электронной почты"
+                  onFocus={() => {
+                    setIsShowKeyboard(true);
+                    setIsFocused1(true);
+                  }}
+                  onBlur={() => setIsFocused1(false)}
+                  onChangeText={(value) =>
+                    setState((prevState) => ({ ...prevState, email: value }))
+                  }
+                  value={state.email}
+                />
+                <TextInput
+                  style={{
+                    ...styles.input,
+                    borderColor: isFocused2 ? "#FF6C00" : "#E8E8E8",
+                  }}
+                  placeholder="Пароль"
+                  secureTextEntry={true}
+                  onFocus={() => {
+                    setIsShowKeyboard(true);
+                    setIsFocused2(true);
+                  }}
+                  onBlur={() => setIsFocused2(false)}
+                  onChangeText={(value) =>
+                    setState((prevState) => ({ ...prevState, password: value }))
+                  }
+                  value={state.password}
+                />
+
+                <TouchableOpacity
+                  style={styles.button}
+                  activeOpacity={0.7}
+                  onPress={onSubmit}>
+                  <Text style={styles.btnText}>Войти</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  activeOpacity={0.7}
+                  onPress={() => navigation.navigate("Register")}
+                  style={{ alignItems: "center" }}>
+                  <Text style={styles.link}>
+                    Нет аккаунта? Зарегистрироваться
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </KeyboardAvoidingView>
+          </View>
+        </ImageBackground>
       </View>
-      {/* <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}> */}
-      <View style={styles.form}>
-        <TextInput
-          style={styles.input}
-          placeholder="Адрес электронной почты"
-          onFocus={() => setIsShowKeyboard(true)}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Пароль"
-          secureTextEntry={true}
-          onFocus={() => setIsShowKeyboard(true)}
-        />
-        <TouchableOpacity
-          style={styles.button}
-          activeOpacity={0.7}
-          onFocus={keyboardHide}>
-          <Text style={styles.btnText}>Войти</Text>
-        </TouchableOpacity>
-      </View>
-      <View style={{ alignItems: "center" }}>
-        <Text style={styles.link}>Нет аккаунта? Зарегистрироваться</Text>
-      </View>
-      {/* </KeyboardAvoidingView> */}
-    </View>
+    </TouchableWithoutFeedback>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
-    paddingTop: 90,
-    paddingBottom: 40,
+    backgroundColor: "#000",
+  },
+
+  content: {
+    flex: -0.7,
+    paddingTop: 92,
+    paddingBottom: 45,
+    justifyContent: "flex-start",
     backgroundColor: "#fff",
     borderTopStartRadius: 25,
     borderTopEndRadius: 25,
-
-    //  marginTop: 219,
   },
+  text: {
+    color: "#00008b",
+    fontSize: 40,
+    fontFamily: "Roboto-Regular",
+  },
+  image: {
+    flex: 1,
+    resizeMode: "cover",
+    justifyContent: "flex-end",
+  },
+
   title: {
     color: "#000",
     fontSize: 36,
     marginBottom: 32,
-    //  fontFamily: "Roboto-Bold",
+    fontFamily: "Roboto-Medium",
   },
   form: {
     marginHorizontal: 16,
@@ -84,6 +153,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     placeholderTextColor: "#BDBDBD",
     fontSize: 16,
+    fontFamily: "Roboto-Regular",
   },
   button: {
     height: 50,
@@ -96,9 +166,11 @@ const styles = StyleSheet.create({
   btnText: {
     color: "#fff",
     fontSize: 16,
+    fontFamily: "Roboto-Regular",
   },
   link: {
     color: "#1B4371",
     fontSize: 16,
+    fontFamily: "Roboto-Regular",
   },
 });

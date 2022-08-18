@@ -1,72 +1,46 @@
+import "react-native-gesture-handler";
 import React from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  ImageBackground,
-  Keyboard,
-  TouchableWithoutFeedback,
-} from "react-native";
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import * as Font from "expo-font";
-import { AppLoading } from "expo";
+// import { AppLoading } from "expo";
 import { RegistrationScreen } from "./screens/RegistrationScreen";
 import { LoginScreen } from "./screens/LoginScreen";
 
+const Stack = createNativeStackNavigator();
 const loadFonts = async () => {
   await Font.loadAsync({
-    "Roboto-Regular": require("./assets/fonts/Roboto-Medium.ttf"),
+    "Roboto-Regular": require("./assets/fonts/Roboto-Regular.ttf"),
     "Roboto-Medium": require("./assets/fonts/Roboto-Medium.ttf"),
   });
 };
 
 export default function App() {
-  const [isReady, setIsReady] = React.useState(false);
-  const [isShowKeyboard, setIsShowKeyboard] = React.useState(false);
-
-  const keyboardHide = () => {
-    setIsShowKeyboard(false);
-    Keyboard.dismiss();
-  };
-
+  //  const [isReady, setIsReady] = React.useState(false);
   //   if (!isReady) {
   //     return (
   //       <AppLoading startAsync={loadFonts} onFinish={() => setIsReady(true)} />
   //     );
   //   }
 
+  React.useEffect(() => {
+    loadFonts();
+  }, []);
+
   return (
-    <TouchableWithoutFeedback onPress={keyboardHide}>
-      <View style={styles.container}>
-        <ImageBackground
-          source={require("./assets/background-image.jpg")}
-          style={styles.image}>
-          <RegistrationScreen
-            isShowKeyboard={isShowKeyboard}
-            setIsShowKeyboard={setIsShowKeyboard}
-          />
-          {/* <LoginScreen /> */}
-        </ImageBackground>
-      </View>
-    </TouchableWithoutFeedback>
+    <NavigationContainer>
+      <Stack.Navigator>
+        <Stack.Screen
+          name="Register"
+          component={RegistrationScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Login"
+          component={LoginScreen}
+          options={{ headerShown: false }}
+        />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#000",
-  },
-  text: {
-    color: "#00008b",
-    fontSize: 40,
-    fontFamily: "Roboto-Medium",
-  },
-  image: {
-    flex: 1,
-    resizeMode: "cover",
-    justifyContent: "flex-end",
-
-    //  alignItems: "center",
-    //  justifyContent: "center",
-  },
-});
