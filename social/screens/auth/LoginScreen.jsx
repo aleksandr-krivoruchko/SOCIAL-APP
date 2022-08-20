@@ -39,7 +39,7 @@ export function LoginScreen({ navigation }) {
     <TouchableWithoutFeedback onPress={keyboardHide}>
       <View style={styles.container}>
         <ImageBackground
-          source={require("../assets/background-image.jpg")}
+          source={require("../../assets/background-image.jpg")}
           style={styles.image}>
           <View
             style={{ ...styles.content, marginTop: isShowKeyboard ? 40 : 0 }}>
