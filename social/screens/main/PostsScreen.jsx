@@ -1,10 +1,17 @@
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View, Image } from "react-native";
+import { Feather } from "react-native-vector-icons";
 
 export function PostsScreen() {
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>PostsScreen</Text>
+      <View style={styles.wrapper}>
+        <Image source={require("../../assets/images/avatar.png")} />
+        <View style={styles.text}>
+          <Text style={styles.name}>Natali Romanova</Text>
+          <Text style={styles.email}>email@example.com</Text>
+        </View>
+      </View>
     </View>
   );
 }
@@ -12,12 +19,40 @@ export function PostsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#000",
+    marginHorizontal: 16,
+    marginVertical: 30,
+    //  justifyContent: "center",
+    //  alignItems: "center",
+    //  flexDirection: "row",
+    //  paddingHorizontal: 16,
+    //  height: 88,
+    //  paddingBottom: 11,
+    //  borderBottomColor: "rgba(0, 0, 0, 0.3)",
+    //  borderBottomWidth: 1,
+    //  backgroundColor: "#fff",
+    //  alignItems: "flex-end",
+    //  justifyContent: "space-between",
+  },
+  wrapper: {
+    flex: 0.1,
+    flexDirection: "row",
     alignItems: "center",
   },
   text: {
-    color: "#fff",
-    fontSize: 40,
+    marginLeft: 10,
+  },
+  name: {
+    color: "#212121",
+    fontSize: 13,
+    fontStyle: "normal",
+    lineHeight: 15,
+    fontFamily: "Roboto-Bold",
+  },
+  email: {
+    color: "rgba(33, 33, 33, 0.8)",
+    fontSize: 11,
+    fontStyle: "normal",
+    lineHeight: 13,
     fontFamily: "Roboto-Regular",
   },
 });

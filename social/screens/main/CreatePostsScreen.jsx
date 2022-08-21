@@ -1,12 +1,13 @@
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { Feather } from "react-native-vector-icons";
+import { MapScreen } from "../main/MapScreen";
+
+const CreateTabs = createBottomTabNavigator();
 
 export function CreatePostsScreen() {
-  return (
-    <View style={styles.container}>
-      <Text style={styles.text}>CreatePostsScreen</Text>
-    </View>
-  );
+  return <Text>CreateScreen</Text>;
 }
 
 const styles = StyleSheet.create({
