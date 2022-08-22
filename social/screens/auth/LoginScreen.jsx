@@ -31,7 +31,6 @@ export function LoginScreen({ navigation }) {
 
   const onSubmit = () => {
     keyboardHide();
-    console.log(state);
     setState(initialState);
   };
 
@@ -145,7 +144,7 @@ const styles = StyleSheet.create({
   },
   input: {
     height: 50,
-    padding: 16,
+    padding: 12,
     borderWidth: 1,
     backgroundColor: "#F6F6F6",
     borderColor: "#E8E8E8",

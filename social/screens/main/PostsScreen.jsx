@@ -1,58 +1,21 @@
 import React from "react";
-import { StyleSheet, Text, View, Image } from "react-native";
-import { Feather } from "react-native-vector-icons";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { DefaultScreen } from "../nested/DefaultScreen";
+import { CommentsScreen } from "../nested/CommentsScreen";
+import { MapScreen } from "../nested/MapScreen";
 
-export function PostsScreen() {
+const NestedScreen = createNativeStackNavigator();
+
+export const PostsScreen = () => {
   return (
-    <View style={styles.container}>
-      <View style={styles.wrapper}>
-        <Image source={require("../../assets/images/avatar.png")} />
-        <View style={styles.text}>
-          <Text style={styles.name}>Natali Romanova</Text>
-          <Text style={styles.email}>email@example.com</Text>
-        </View>
-      </View>
-    </View>
+    <NestedScreen.Navigator initialRouteName="DefaultScreen">
+      <NestedScreen.Screen
+        name="DefaultScreen"
+        component={DefaultScreen}
+        options={{ headerShown: false }}
+      />
+      <NestedScreen.Screen name="Comments" component={CommentsScreen} />
+      <NestedScreen.Screen name="Map" component={MapScreen} />
+    </NestedScreen.Navigator>
   );
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    marginHorizontal: 16,
-    marginVertical: 30,
-    //  justifyContent: "center",
-    //  alignItems: "center",
-    //  flexDirection: "row",
-    //  paddingHorizontal: 16,
-    //  height: 88,
-    //  paddingBottom: 11,
-    //  borderBottomColor: "rgba(0, 0, 0, 0.3)",
-    //  borderBottomWidth: 1,
-    //  backgroundColor: "#fff",
-    //  alignItems: "flex-end",
-    //  justifyContent: "space-between",
-  },
-  wrapper: {
-    flex: 0.1,
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  text: {
-    marginLeft: 10,
-  },
-  name: {
-    color: "#212121",
-    fontSize: 13,
-    fontStyle: "normal",
-    lineHeight: 15,
-    fontFamily: "Roboto-Bold",
-  },
-  email: {
-    color: "rgba(33, 33, 33, 0.8)",
-    fontSize: 11,
-    fontStyle: "normal",
-    lineHeight: 13,
-    fontFamily: "Roboto-Regular",
-  },
-});
+};
