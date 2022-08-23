@@ -1,153 +1,55 @@
-// import React, { useState, useEffect, useRef } from "react";
-// import { Text, View, TouchableOpacity, StyleSheet } from "react-native";
-// import { Camera } from "expo-camera";
-// import * as MediaLibrary from "expo-media-library";
-
-// export function CreatePostsScreen() {
-//   const [hasPermission, setHasPermission] = useState(null);
-//   const [cameraRef, setCameraRef] = useState(null);
-//   const [type, setType] = useState(Camera.Constants.Type.back);
-//   const [photo, setPhoto] = useState(null);
-
-//   useEffect(() => {
-//     (async () => {
-//       const { status } = await Camera.requestCameraPermissionsAsync();
-//       await MediaLibrary.requestPermissionsAsync();
-
-//       setHasPermission(status === "granted");
-//     })();
-//   }, []);
-
-//   if (hasPermission === null) {
-//     return <View />;
-//   }
-//   if (hasPermission === false) {
-//     return <Text>No access to camera</Text>;
-//   }
-
-//   return (
-//     <View style={styles.container}>
-//       <Camera
-//         style={styles.camera}
-//         type={type}
-//         ref={(ref) => {
-//           setCameraRef(ref);
-//         }}>
-//         {photo && (
-//           <View style={styles.takePhotoContainer}>
-//             <Image
-//               source={{ uri: photo }}
-//               style={{ height: 200, width: 200 }}
-//             />
-//           </View>
-//         )}
-//         <View style={styles.photoView}>
-//           <TouchableOpacity
-//             style={styles.flipContainer}
-//             onPress={() => {
-//               setType(
-//                 type === Camera.Constants.Type.back
-//                   ? Camera.Constants.Type.front
-//                   : Camera.Constants.Type.back
-//               );
-//             }}>
-//             <Text style={{ fontSize: 18, marginBottom: 10, color: "white" }}>
-//               Flip
-//             </Text>
-//           </TouchableOpacity>
-//           <TouchableOpacity
-//             style={styles.button}
-//             onPress={async () => {
-//               if (cameraRef) {
-//                 const { uri } = await cameraRef.takePictureAsync();
-//                 console.log(uri);
-//                 setPhoto(photo.uri);
-//                 await MediaLibrary.createAssetAsync(uri);
-//               }
-//             }}>
-//             <View style={styles.takePhotoOut}>
-//               <View style={styles.takePhotoInner}></View>
-//             </View>
-//           </TouchableOpacity>
-//         </View>
-//       </Camera>
-//     </View>
-//   );
-// }
-
-// const styles = StyleSheet.create({
-//   container: { flex: 1 },
-//   camera: { flex: 1 },
-//   photoView: {
-//     flex: 1,
-//     backgroundColor: "transparent",
-//     justifyContent: "flex-end",
-//   },
-
-//   flipContainer: {
-//     flex: 0.1,
-//     alignSelf: "flex-end",
-//   },
-
-//   button: { alignSelf: "center" },
-
-//   takePhotoOut: {
-//     borderWidth: 2,
-//     borderColor: "white",
-//     height: 50,
-//     width: 50,
-//     display: "flex",
-//     justifyContent: "center",
-//     alignItems: "center",
-//     borderRadius: 50,
-//   },
-
-//   takePhotoInner: {
-//     borderWidth: 2,
-//     borderColor: "white",
-//     height: 40,
-//     width: 40,
-//     backgroundColor: "white",
-//     borderRadius: 50,
-//   },
-//   takePhotoContainer: {
-//     position: "absolute",
-//     top: 50,
-//     left: 10,
-//     borderColor: "#fff",
-//     borderWidth: 1,
-//   },
-// });
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
-  View,
   Text,
+  View,
+  TouchableOpacity,
   StyleSheet,
-  Image,
   TextInput,
   TouchableHighlight,
+  Image,
 } from "react-native";
 import { Camera } from "expo-camera";
-import { TouchableOpacity } from "react-native-gesture-handler";
+import * as Location from "expo-location";
+import * as MediaLibrary from "expo-media-library";
 import { Feather } from "react-native-vector-icons";
 
-export const CreatePostsScreen = () => {
-  const [camera, setCamera] = useState(null);
+export function CreatePostsScreen({ navigation }) {
+  //   const [hasPermission, setHasPermission] = useState(null);
+  const [cameraRef, setCameraRef] = useState(null);
+  const [type, setType] = useState(Camera.Constants.Type.back);
   const [photo, setPhoto] = useState(null);
+  const [name, setName] = useState(null);
+  const [location, setLocation] = useState(null);
+  //   useEffect(() => {
+  //     (async () => {
+  //       const { status } = await Camera.requestCameraPermissionsAsync();
+  //       // await MediaLibrary.requestPermissionsAsync();
+  //       console.log("status", status);
+  //       setHasPermission(status === "granted");
+  //     })();
+  //   }, []);
 
-  const takePhoto = async () => {
-    const photo = await camera.takePictureAsync();
-    setPhoto(photo.uri);
-    console.log("photo", photo);
-  };
+  //   if (!hasPermission) {
+  //     return <Text>No access to camera</Text>;
+  //   }
 
   const onSubmit = () => {
-    console.log("qqqqqqqq");
+    navigation.navigate("DefaultScreen", {
+      photo,
+      name,
+      location,
+    });
   };
+
   return (
     <View style={styles.container}>
       <View style={{ marginHorizontal: 16, marginTop: 30 }}>
-        <Camera style={styles.camera} ref={setCamera}>
+        <Camera
+          style={styles.camera}
+          type={type}
+          ref={(ref) => {
+            setCameraRef(ref);
+          }}>
           {photo && (
             <View style={styles.takePhotoContainer}>
               <Image
@@ -156,13 +58,53 @@ export const CreatePostsScreen = () => {
               />
             </View>
           )}
-          <TouchableOpacity onPress={takePhoto} style={styles.snapContainer}>
-            <Text style={styles.snap}>SNAP</Text>
-          </TouchableOpacity>
+          <View style={styles.photoView}>
+            <TouchableOpacity
+              style={styles.flipContainer}
+              onPress={() => {
+                setType(
+                  type === Camera.Constants.Type.back
+                    ? Camera.Constants.Type.front
+                    : Camera.Constants.Type.back
+                );
+              }}>
+              <Text style={{ fontSize: 18, marginBottom: 10, color: "white" }}>
+                Flip
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.snap}
+              onPress={async () => {
+                if (cameraRef) {
+                  const { uri } = await cameraRef.takePictureAsync({});
+                  const location = await Location.getCurrentPositionAsync({});
+
+                  console.log("loc", location);
+
+                  setPhoto(uri);
+                  setLocation(location);
+                  //  await MediaLibrary.createAssetAsync(uri);
+                }
+              }}>
+              <View style={styles.takePhotoOut}>
+                <View style={styles.takePhotoInner}></View>
+              </View>
+            </TouchableOpacity>
+          </View>
         </Camera>
         <Text style={styles.text}>Загрузите фото</Text>
-        <TextInput style={styles.input} placeholder="Название..." />
-        <TextInput style={styles.input} placeholder="Местность..." />
+        <TextInput
+          style={styles.input}
+          placeholder="Название..."
+          onChangeText={(value) => setName(value)}
+          value={name}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Местность..."
+          onChangeText={(value) => setLocation(value)}
+          value={location}
+        />
         <TouchableHighlight
           style={styles.button}
           activeOpacity={0.6}
@@ -170,10 +112,17 @@ export const CreatePostsScreen = () => {
           onPress={onSubmit}>
           <Text style={styles.btnText}>Опубликовать</Text>
         </TouchableHighlight>
+        <TouchableHighlight
+          style={styles.button}
+          activeOpacity={0.6}
+          underlayColor={"#FF6C00"}
+          onPress={() => console.log("delete")}>
+          <Feather name="trash-2" size={24} color="#DADADA" />
+        </TouchableHighlight>
       </View>
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -190,18 +139,37 @@ const styles = StyleSheet.create({
     backgroundColor: "#F6F6F6",
     marginBottom: 10,
   },
-  snap: {
-    color: "#fff",
+  photoView: {
+    flex: 1,
+    backgroundColor: "transparent",
+    justifyContent: "flex-end",
   },
-  snapContainer: {
-    borderWidth: 1,
-    borderColor: "#ff0000",
-    width: 70,
-    height: 70,
-    borderRadius: 50,
+
+  flipContainer: {
+    flex: 0.2,
+    alignSelf: "center",
+  },
+
+  snap: { alignSelf: "center" },
+
+  takePhotoOut: {
+    borderWidth: 2,
+    borderColor: "white",
+    height: 50,
+    width: 50,
+    display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: 20,
+    borderRadius: 50,
+  },
+
+  takePhotoInner: {
+    borderWidth: 2,
+    borderColor: "white",
+    height: 40,
+    width: 40,
+    backgroundColor: "white",
+    borderRadius: 50,
   },
   takePhotoContainer: {
     position: "absolute",

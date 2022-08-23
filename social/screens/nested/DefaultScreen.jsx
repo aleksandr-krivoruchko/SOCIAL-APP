@@ -1,17 +1,47 @@
 import React from "react";
-import { StyleSheet, Text, View, Image } from "react-native";
-import { Feather } from "react-native-vector-icons";
+import {
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  FlatList,
+  SafeAreaView,
+} from "react-native";
+import { Post } from "../../components/Post";
 
-export function DefaultScreen() {
+const Item = () => (
+  <View style={styles.wrapper}>
+    <Image
+      source={require("../../assets/images/avatar.png")}
+      style={{ width: 60, height: 60 }}
+    />
+    <View style={styles.text}>
+      <Text style={styles.name}>NAME</Text>
+      <Text style={styles.email}>EMAIL</Text>
+    </View>
+  </View>
+);
+
+export function DefaultScreen({ route }) {
+  const [posts, setPosts] = React.useState([]);
+  const renderItem = ({ item }) => <Post item={item} />;
+
+  React.useEffect(() => {
+    if (route.params) {
+      setPosts((prevState) => [...prevState, route.params]);
+    }
+  }, [route.params]);
+
   return (
     <View style={styles.container}>
-      <View style={styles.wrapper}>
-        <Image source={require("../../assets/images/avatar.png")} />
-        <View style={styles.text}>
-          <Text style={styles.name}>Natali Romanova</Text>
-          <Text style={styles.email}>email@example.com</Text>
-        </View>
-      </View>
+      <Item />
+      <SafeAreaView>
+        <FlatList
+          data={posts}
+          renderItem={renderItem}
+          keyExtractor={(item, idx) => idx.toString()}
+        />
+      </SafeAreaView>
     </View>
   );
 }
@@ -19,24 +49,16 @@ export function DefaultScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    //  backgroundColor: "#fff",
     marginHorizontal: 16,
     marginVertical: 30,
-    //  justifyContent: "center",
-    //  alignItems: "center",
-    //  flexDirection: "row",
-    //  paddingHorizontal: 16,
-    //  height: 88,
-    //  paddingBottom: 11,
-    //  borderBottomColor: "rgba(0, 0, 0, 0.3)",
-    //  borderBottomWidth: 1,
-    //  backgroundColor: "#fff",
-    //  alignItems: "flex-end",
-    //  justifyContent: "space-between",
+    marginBottom: 20,
   },
   wrapper: {
-    flex: 0.1,
+    height: 50,
     flexDirection: "row",
     alignItems: "center",
+    marginBottom: 30,
   },
   text: {
     marginLeft: 10,
