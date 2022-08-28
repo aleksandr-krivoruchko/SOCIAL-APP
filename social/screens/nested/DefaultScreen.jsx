@@ -22,9 +22,16 @@ const Item = () => (
   </View>
 );
 
-export function DefaultScreen({ route }) {
+export function DefaultScreen({ route, navigation }) {
   const [posts, setPosts] = React.useState([]);
-  const renderItem = ({ item }) => <Post item={item} />;
+  const renderItem = ({ item }) => (
+    <Post
+      item={item}
+      toMap={() => navigation.navigate("Map")}
+      toComments={() => navigation.navigate("Comments")}
+    />
+  );
+  console.log("route params default", route.params);
 
   React.useEffect(() => {
     if (route.params) {

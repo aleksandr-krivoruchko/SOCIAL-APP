@@ -8,91 +8,138 @@ import {
   TouchableHighlight,
   Image,
 } from "react-native";
-import { Camera } from "expo-camera";
+import { Camera, CameraType } from "expo-camera";
 import * as Location from "expo-location";
 import * as MediaLibrary from "expo-media-library";
 import { Feather } from "react-native-vector-icons";
+import Button from "../../components/Button";
 
 export function CreatePostsScreen({ navigation }) {
-  //   const [hasPermission, setHasPermission] = useState(null);
-  const [cameraRef, setCameraRef] = useState(null);
-  const [type, setType] = useState(Camera.Constants.Type.back);
-  const [photo, setPhoto] = useState(null);
   const [name, setName] = useState(null);
   const [location, setLocation] = useState(null);
-  //   useEffect(() => {
-  //     (async () => {
-  //       const { status } = await Camera.requestCameraPermissionsAsync();
-  //       // await MediaLibrary.requestPermissionsAsync();
-  //       console.log("status", status);
-  //       setHasPermission(status === "granted");
-  //     })();
-  //   }, []);
+  const [hasCameraPermission, setHasCameraPermission] = useState(null);
+  const [image, setImage] = useState(null);
+  const [type, setType] = useState(Camera.Constants.Type.back);
+  const cameraRef = useRef(null);
 
-  //   if (!hasPermission) {
-  //     return <Text>No access to camera</Text>;
-  //   }
+  useEffect(() => {
+    (async () => {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        setErrorMsg("Permission to access location was denied");
+        return;
+      }
+    })();
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      MediaLibrary.requestPermissionsAsync();
+      const cameraStatus = await Camera.requestCameraPermissionsAsync();
+      setHasCameraPermission(cameraStatus.status === "granted");
+    })();
+  }, []);
+
+  const takePicture = async () => {
+    if (cameraRef) {
+      try {
+        const { uri } = await cameraRef.current.takePictureAsync();
+        setImage(uri);
+
+        const location = await Location.getCurrentPositionAsync({});
+        console.log(location);
+        setLocation(location);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
+
+  const savePicture = async () => {
+    if (image) {
+      try {
+        await MediaLibrary.createAssetAsync(image);
+        alert("Picture saved! 🎉");
+        setImage(null);
+        console.log("saved successfully");
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
+
+  if (!hasCameraPermission) {
+    return <Text>No access to camera</Text>;
+  }
 
   const onSubmit = () => {
+    if (!image) {
+      console.log("Make the photo");
+      return;
+    }
     navigation.navigate("DefaultScreen", {
-      photo,
+      image,
       name,
       location,
     });
+    setName(null);
+    setLocation(null);
   };
 
   return (
     <View style={styles.container}>
-      <View style={{ marginHorizontal: 16, marginTop: 30 }}>
-        <Camera
-          style={styles.camera}
-          type={type}
-          ref={(ref) => {
-            setCameraRef(ref);
-          }}>
-          {photo && (
-            <View style={styles.takePhotoContainer}>
-              <Image
-                source={{ uri: photo }}
-                style={{ height: 200, width: 200 }}
-              />
-            </View>
-          )}
-          <View style={styles.photoView}>
-            <TouchableOpacity
-              style={styles.flipContainer}
-              onPress={() => {
-                setType(
-                  type === Camera.Constants.Type.back
-                    ? Camera.Constants.Type.front
-                    : Camera.Constants.Type.back
-                );
-              }}>
-              <Text style={{ fontSize: 18, marginBottom: 10, color: "white" }}>
-                Flip
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.snap}
-              onPress={async () => {
-                if (cameraRef) {
-                  const { uri } = await cameraRef.takePictureAsync({});
-                  const location = await Location.getCurrentPositionAsync({});
-
-                  console.log("loc", location);
-
-                  setPhoto(uri);
-                  setLocation(location);
-                  //  await MediaLibrary.createAssetAsync(uri);
-                }
-              }}>
-              <View style={styles.takePhotoOut}>
-                <View style={styles.takePhotoInner}></View>
+      <View style={{ marginHorizontal: 16, marginTop: 10 }}>
+        <View style={styles.containerCamera}>
+          {!image ? (
+            <Camera style={styles.camera} type={type} ref={cameraRef}>
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  paddingHorizontal: 30,
+                }}>
+                <Button
+                  title=""
+                  icon="retweet"
+                  onPress={() => {
+                    setType(
+                      type === CameraType.back
+                        ? CameraType.front
+                        : CameraType.back
+                    );
+                  }}
+                />
               </View>
-            </TouchableOpacity>
+            </Camera>
+          ) : (
+            <Image source={{ uri: image }} style={styles.camera} />
+          )}
+
+          <View style={styles.controls}>
+            {image ? (
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  paddingHorizontal: 50,
+                }}>
+                <Button
+                  title="Re-take"
+                  onPress={() => setImage(null)}
+                  icon="retweet"
+                />
+                <Button title="Save" onPress={savePicture} icon="check" />
+              </View>
+            ) : (
+              <Button
+                title="Take a picture"
+                onPress={takePicture}
+                icon="camera"
+              />
+            )}
           </View>
-        </Camera>
-        <Text style={styles.text}>Загрузите фото</Text>
+        </View>
+        {/* <Text style={styles.text}>Загрузите фото</Text> */}
         <TextInput
           style={styles.input}
           placeholder="Название..."
@@ -129,55 +176,72 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
   },
-  camera: {
-    height: 240,
-    alignItems: "center",
-    justifyContent: "flex-end",
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: "#E8E8E8",
-    backgroundColor: "#F6F6F6",
-    marginBottom: 10,
-  },
-  photoView: {
-    flex: 1,
-    backgroundColor: "transparent",
-    justifyContent: "flex-end",
-  },
-
-  flipContainer: {
-    flex: 0.2,
-    alignSelf: "center",
-  },
-
-  snap: { alignSelf: "center" },
-
-  takePhotoOut: {
-    borderWidth: 2,
-    borderColor: "white",
-    height: 50,
-    width: 50,
-    display: "flex",
+  containerCamera: {
+    height: 250,
     justifyContent: "center",
-    alignItems: "center",
-    borderRadius: 50,
+    //  paddingTop: Constants.statusBarHeight,
+    backgroundColor: "#000",
+    //  padding: 8,
   },
+  //   controls: {
+  //     flex: 0.5,
+  //   },
+  camera: {
+    flex: 1,
+  },
+  //   topControls: {
+  //     flex: 1,
+  //   },
 
-  takePhotoInner: {
-    borderWidth: 2,
-    borderColor: "white",
-    height: 40,
-    width: 40,
-    backgroundColor: "white",
-    borderRadius: 50,
-  },
-  takePhotoContainer: {
-    position: "absolute",
-    top: 50,
-    left: 10,
-    borderColor: "#fff",
-    borderWidth: 1,
-  },
+  //   camera: {
+  //     height: 200,
+  //     alignItems: "center",
+  //     justifyContent: "flex-end",
+  //     borderRadius: 10,
+  //     borderWidth: 1,
+  //     borderColor: "#E8E8E8",
+  //     backgroundColor: "#F6F6F6",
+  //     marginBottom: 10,
+  //   },
+  //   photoView: {
+  //     flex: 1,
+  //     backgroundColor: "transparent",
+  //     justifyContent: "flex-end",
+  //   },
+
+  //   flipContainer: {
+  //     flex: 0.2,
+  //     alignSelf: "center",
+  //   },
+
+  //   snap: { alignSelf: "center" },
+
+  //   takePhotoOut: {
+  //     borderWidth: 2,
+  //     borderColor: "white",
+  //     height: 50,
+  //     width: 50,
+  //     display: "flex",
+  //     justifyContent: "center",
+  //     alignItems: "center",
+  //     borderRadius: 50,
+  //   },
+
+  //   takePhotoInner: {
+  //     borderWidth: 2,
+  //     borderColor: "white",
+  //     height: 40,
+  //     width: 40,
+  //     backgroundColor: "white",
+  //     borderRadius: 50,
+  //   },
+  //   takePhotoContainer: {
+  //     position: "absolute",
+  //     top: 50,
+  //     left: 10,
+  //     borderColor: "#fff",
+  //     borderWidth: 1,
+  //   },
   text: {
     color: "#BDBDBD",
     fontSize: 16,

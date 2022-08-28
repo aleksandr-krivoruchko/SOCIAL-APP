@@ -1,19 +1,12 @@
 import React from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  Image,
-  FlatList,
-  SafeAreaView,
-} from "react-native";
+import { StyleSheet, Text, View, Image, TouchableOpacity } from "react-native";
 import { Feather } from "react-native-vector-icons";
 
-export function Post({ item }) {
-  const { photo, name, comments, location } = item;
+export function Post({ item, toMap, toComments }) {
+  const { image, name, comments, location } = item;
   return (
     <View style={{ marginBottom: 30 }}>
-      <Image source={{ uri: photo }} style={styles.image} />
+      <Image source={{ uri: image }} style={styles.image} />
       <Text style={styles.name}>{name ?? "Photo name"}</Text>
       <View
         style={{
@@ -21,14 +14,14 @@ export function Post({ item }) {
           justifyContent: "space-between",
           marginHorizontal: 5,
         }}>
-        <View style={{ flexDirection: "row" }}>
+        <TouchableOpacity style={{ flexDirection: "row" }} onPress={toComments}>
           <Feather name="message-circle" size={18} color="#BDBDBD" />
           <Text style={styles.comment}>{comments ?? 0}</Text>
-        </View>
-        <View style={{ flexDirection: "row" }}>
+        </TouchableOpacity>
+        <TouchableOpacity style={{ flexDirection: "row" }} onPress={toMap}>
           <Feather name="map-pin" size={18} color="#BDBDBD" />
           <Text style={styles.location}>{location ?? "Location"}</Text>
-        </View>
+        </TouchableOpacity>
       </View>
     </View>
   );
