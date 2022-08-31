@@ -1,4 +1,5 @@
 import React from "react";
+import { useDispatch } from "react-redux";
 import {
   StyleSheet,
   Text,
@@ -11,6 +12,8 @@ import {
   KeyboardAvoidingView,
   TouchableWithoutFeedback,
 } from "react-native";
+import { signUp } from "../../redux/auth/authOperations";
+import { auth } from "../../firebase/firebase";
 
 const initialState = {
   login: "",
@@ -24,6 +27,7 @@ export function RegistrationScreen({ navigation }) {
   const [isFocused1, setIsFocused1] = React.useState(false);
   const [isFocused2, setIsFocused2] = React.useState(false);
   const [isFocused3, setIsFocused3] = React.useState(false);
+  const dispatch = useDispatch();
 
   const keyboardHide = () => {
     setIsShowKeyboard(false);
@@ -32,7 +36,17 @@ export function RegistrationScreen({ navigation }) {
 
   const onSubmit = () => {
     keyboardHide();
-    console.log(state);
+    //  dispatch(signUp(state));
+    auth
+      .createUserWithEmailAndPassword(state.email, state.password)
+      .then((userCredential) => {
+        const user = userCredential.user;
+        console.log(user.email);
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+      });
     setState(initialState);
   };
 
